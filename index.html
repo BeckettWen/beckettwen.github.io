@@ -15,54 +15,68 @@
     </nav>
 
     <main>
-    <section id="hero-view" class="hero">
-        <div class="hero-bg" id="hero-bg"></div>
-        <div class="hero-text">
-            <h1 id="post-title">Loading...</h1>
-            <p id="post-desc"></p>
-            <a href="javascript:void(0)" onclick="readFullPost()" id="post-link" class="cta">Read More ></a>
-        </div>
-    </section>
+        <section id="hero-view" class="hero">
+            <div class="hero-bg" id="hero-bg"></div>
+            
+            <div class="hero-text">
+                <span class="label">Latest Post</span>
+                <h1 id="post-title">Loading...</h1>
+                <p id="post-desc"></p>
+                <a href="javascript:void(0)" onclick="readFullPost()" id="post-link" class="cta">Read More ></a>
+            </div>
+        </section>
 
-    <section id="article-view" style="display:none; padding-top: 100px; max-width: 800px; margin: 0 auto;">
-        <div id="full-content"></div>
-        <a href="index.html" style="display: block; margin-top: 50px; color: #0066cc;"> < Back to Home</a>
-    </section>
-</main>
+        <section id="article-view" style="display:none; padding: 120px 20px; max-width: 800px; margin: 0 auto;">
+            <div id="full-content"></div>
+            <a href="index.html" style="display: inline-block; margin-top: 50px; color: #0066cc; text-decoration: none; font-weight: 500;"> ← Back to Home</a>
+        </section>
+    </main>
 
-<script>
-    let currentPostPath = "";
+    <script>
+        let currentPostPath = "";
 
-    async function loadLatestPost() {
-        const response = await fetch('posts.json');
-        const posts = await response.json();
-        const latest = posts[0];
+        async function loadLatestPost() {
+            try {
+                const response = await fetch('posts.json');
+                if (!response.ok) throw new Error("Could not find posts.json");
+                
+                const posts = await response.json();
+                const latest = posts[0];
 
-        document.getElementById('post-title').innerText = latest.title;
-        document.getElementById('post-desc').innerText = latest.description;
-        document.getElementById('hero-bg').style.backgroundImage = `url('${latest.imagePath}')`;
-        
-        // Store the path for the click event
-        currentPostPath = latest.contentPath;
-    }
+                // 1. Update text
+                document.getElementById('post-title').innerText = latest.title;
+                document.getElementById('post-desc').innerText = latest.description;
+                
+                // 2. Apply background image to the hero-bg div
+                const bgElement = document.getElementById('hero-bg');
+                bgElement.style.backgroundImage = `url('${latest.imagePath}')`;
+                
+                // 3. Store path for the reader
+                currentPostPath = latest.contentPath;
 
-    async function readFullPost() {
-        // 1. Fetch the snippet HTML
-        const response = await fetch(currentPostPath);
-        const htmlContent = await response.text();
+                console.log("Image path loaded:", latest.imagePath);
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('post-title').innerText = "Failed to load post.";
+            }
+        }
 
-        // 2. Hide Hero, Show Article
-        document.getElementById('hero-view').style.display = 'none';
-        document.getElementById('article-view').style.display = 'block';
+        async function readFullPost() {
+            try {
+                const response = await fetch(currentPostPath);
+                const htmlContent = await response.text();
 
-        // 3. Inject the HTML into the page
-        document.getElementById('full-content').innerHTML = htmlContent;
-        
-        // 4. Scroll to top
-        window.scrollTo(0,0);
-    }
+                document.getElementById('hero-view').style.display = 'none';
+                document.getElementById('article-view').style.display = 'block';
+                document.getElementById('full-content').innerHTML = htmlContent;
+                
+                window.scrollTo(0,0);
+            } catch (error) {
+                alert("Article could not be loaded.");
+            }
+        }
 
-    window.onload = loadLatestPost;
-</script>
+        window.onload = loadLatestPost;
+    </script>
 </body>
 </html>
