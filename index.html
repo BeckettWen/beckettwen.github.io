@@ -1,7 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beckett Wen | Blog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-    <h1>Connection Test: Successful</h1>
-    <p>My custom blog design is coming soon.</p>
+
+    <nav class="glass-nav">
+        <div class="nav-content">
+            <a href="index.html" class="logo">Beckett Wen</a>
+        </div>
+    </nav>
+
+    <main>
+    <section id="hero-view" class="hero">
+        <div class="hero-bg" id="hero-bg"></div>
+        <div class="hero-text">
+            <h1 id="post-title">Loading...</h1>
+            <p id="post-desc"></p>
+            <a href="javascript:void(0)" onclick="readFullPost()" id="post-link" class="cta">Read More ></a>
+        </div>
+    </section>
+
+    <section id="article-view" style="display:none; padding-top: 100px; max-width: 800px; margin: 0 auto;">
+        <div id="full-content"></div>
+        <a href="index.html" style="display: block; margin-top: 50px; color: #0066cc;"> < Back to Home</a>
+    </section>
+</main>
+
+<script>
+    let currentPostPath = "";
+
+    async function loadLatestPost() {
+        const response = await fetch('posts.json');
+        const posts = await response.json();
+        const latest = posts[0];
+
+        document.getElementById('post-title').innerText = latest.title;
+        document.getElementById('post-desc').innerText = latest.description;
+        document.getElementById('hero-bg').style.backgroundImage = `url('${latest.imagePath}')`;
+        
+        // Store the path for the click event
+        currentPostPath = latest.contentPath;
+    }
+
+    async function readFullPost() {
+        // 1. Fetch the snippet HTML
+        const response = await fetch(currentPostPath);
+        const htmlContent = await response.text();
+
+        // 2. Hide Hero, Show Article
+        document.getElementById('hero-view').style.display = 'none';
+        document.getElementById('article-view').style.display = 'block';
+
+        // 3. Inject the HTML into the page
+        document.getElementById('full-content').innerHTML = htmlContent;
+        
+        // 4. Scroll to top
+        window.scrollTo(0,0);
+    }
+
+    window.onload = loadLatestPost;
+</script>
 </body>
 </html>
