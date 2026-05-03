@@ -325,3 +325,7 @@ footer {
     to { opacity: 1; transform: translateY(0); }
 }
 
+.cta:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+}

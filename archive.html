@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archive | Beckett Wen</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="glass-nav">
+        <div class="nav-content">
+            <a href="index.html" class="logo">Beckett Wen | Blog</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="newsroom-container" style="padding-top: 100px;">
+            <div class="newsroom-header">
+                <h2>Full Archive</h2>
+            </div>
+            <div class="newsroom-grid" id="archive-grid">
+                </div>
+        </section>
+
+        <section id="article-view" style="display:none; padding: 120px 20px;">
+            <div id="full-content" style="max-width: 800px; margin: 0 auto;"></div>
+            <div style="max-width: 800px; margin: 40px auto; text-align: center;">
+                <a href="archive.html" style="color: #0066cc; text-decoration: none; font-weight: 500;">← Back to Archive</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        async function loadFullArchive() {
+            try {
+                const response = await fetch('posts.json');
+                const posts = await response.json();
+                const grid = document.getElementById('archive-grid');
+
+                posts.forEach(post => {
+                    const card = document.createElement('div');
+                    card.className = 'newsroom-card';
+                    card.onclick = () => readFullPost(post.contentPath);
+                    card.innerHTML = `
+                        <div class="card-image" style="background-image: url('${post.imagePath}')"></div>
+                        <div class="card-info">
+                            <span class="card-category">Journal</span>
+                            <h3>${post.title}</h3>
+                            <p>${post.description}</p>
+                        </div>`;
+                    grid.appendChild(card);
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        async function readFullPost(path) {
+            const response = await fetch(path);
+            const htmlContent = await response.text();
+            document.querySelector('.newsroom-container').style.display = 'none';
+            document.getElementById('article-view').style.display = 'block';
+            document.getElementById('full-content').innerHTML = htmlContent;
+            window.scrollTo(0,0);
+        }
+
+        window.onload = loadFullArchive;
+    </script>
+</body>
+</html>

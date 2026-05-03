@@ -27,12 +27,16 @@
         </section>
 
         <section class="newsroom-container">
-            <div class="newsroom-header">
-                <h2>Archive</h2>
-            </div>
-            <div class="newsroom-grid" id="newsroom-grid">
-                </div>
-        </section>
+    <div class="newsroom-header">
+        <h2>Archive</h2>
+    </div>
+    <div class="newsroom-grid" id="newsroom-grid">
+        </div>
+    
+    <div style="text-align: center; margin-top: 50px;">
+        <a href="archive.html" class="cta" style="font-weight: 500; font-size: 20px;">See More Archive ></a>
+    </div>
+</section>
     </div>
 
     <section id="article-view" style="display:none; padding: 120px 20px;">
@@ -65,33 +69,31 @@ async function initBlog() {
         const response = await fetch('posts.json');
         const posts = await response.json();
         
-        // 1. Setup Hero (The 1st post in JSON)
+        // 1. Setup Hero
         const latest = posts[0];
         document.getElementById('post-title').innerText = latest.title;
         document.getElementById('post-desc').innerText = latest.description;
         document.getElementById('hero-bg').style.backgroundImage = `url('${latest.imagePath}')`;
         currentPostPath = latest.contentPath;
 
-        // 2. Setup Newsroom (Changed to show ALL posts, including the latest)
+        // 2. Setup Newsroom (Limited to first 3 posts)
         const grid = document.getElementById('newsroom-grid');
+        const previewPosts = posts.slice(0, 3); // Shows only the 3 latest
         
-        // Removed .slice(1) so the latest post also appears in the grid below
-        posts.forEach(post => {
+        previewPosts.forEach(post => {
             const card = document.createElement('div');
             card.className = 'newsroom-card';
             card.onclick = () => readFullPost(post.contentPath);
-            
             card.innerHTML = `
                 <div class="card-image" style="background-image: url('${post.imagePath}')"></div>
                 <div class="card-info">
                     <span class="card-category">Journal</span>
                     <h3>${post.title}</h3>
                     <p>${post.description}</p>
-                </div>
-            `;
+                </div>`;
             grid.appendChild(card);
         });
-    } catch (e) { console.error("Error initializing blog:", e); }
+    } catch (e) { console.error(e); }
 }
 
 async function readFullPost(path) {
